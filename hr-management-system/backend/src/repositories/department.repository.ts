@@ -1,4 +1,5 @@
-import { Department } from '@prisma/client';
+import { Department} from '@prisma/client';
+import prisma from '../config/database';
 
 export interface CreateDepartmentData {
   name: string;
@@ -19,7 +20,8 @@ export class DepartmentRepository {
     });
   }
 
-  async findById(id: string): Promise<Department | null> {
+  // CORRECTION: Le type de retour ": Promise<Department | null>" a été supprimé
+  async findById(id: string) {
     return prisma.department.findUnique({
       where: { id },
       include: {

@@ -1,4 +1,6 @@
+import { Request, Response, NextFunction } from 'express';
 import { DepartmentService } from '../services/department.service';
+import { ResponseUtil } from '../utils/response.util';
 
 export class DepartmentController {
   private departmentService: DepartmentService;

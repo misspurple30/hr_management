@@ -3,6 +3,7 @@ import {
   CreateDepartmentData,
   UpdateDepartmentData,
 } from '../repositories/department.repository';
+import { AppError } from '../middlewares/error.middleware';
 
 export class DepartmentService {
   private departmentRepository: DepartmentRepository;

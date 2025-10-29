@@ -1,6 +1,6 @@
 import { UserRepository } from '../repositories/user.repository';
 import { PasswordUtil } from '../utils/password.util';
-import { JwtUtil } from '../utils/jwt.util';
+import { JWTUtil } from '../utils/jwt.util';
 import { AppError } from '../middlewares/error.middleware';
 
 interface RegisterData {
@@ -49,8 +49,8 @@ export class AuthService {
       role: user.role,
     };
 
-    const accessToken = JwtUtil.generateAccessToken(payload);
-    const refreshToken = JwtUtil.generateRefreshToken(payload);
+    const accessToken = JWTUtil.generateAccessToken(payload);
+    const refreshToken = JWTUtil.generateRefreshToken(payload);
 
     return {
       user: {
@@ -87,8 +87,8 @@ export class AuthService {
       role: user.role,
     };
 
-    const accessToken = JwtUtil.generateAccessToken(payload);
-    const refreshToken = JwtUtil.generateRefreshToken(payload);
+    const accessToken = JWTUtil.generateAccessToken(payload);
+    const refreshToken = JWTUtil.generateRefreshToken(payload);
 
     return {
       user: {
@@ -113,7 +113,7 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     try {
-      const decoded = JwtUtil.verifyRefreshToken(refreshToken);
+      const decoded = JWTUtil.verifyRefreshToken(refreshToken);
       
       const user = await this.userRepository.findById(decoded.id);
       if (!user) {
@@ -126,8 +126,8 @@ export class AuthService {
         role: user.role,
       };
 
-      const newAccessToken = JwtUtil.generateAccessToken(payload);
-      const newRefreshToken = JwtUtil.generateRefreshToken(payload);
+      const newAccessToken = JWTUtil.generateAccessToken(payload);
+      const newRefreshToken = JWTUtil.generateRefreshToken(payload);
 
       return {
         accessToken: newAccessToken,

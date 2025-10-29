@@ -1,4 +1,5 @@
 import { Employee, EmployeeStatus, Prisma } from '@prisma/client';
+import prisma from '../config/database';
 
 export interface CreateEmployeeData {
   userId: string;

@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { JwtUtil } from '../utils/jwt.util';
+import { JWTUtil } from '../utils/jwt.util';
 import { ResponseUtil } from '../utils/response.util';
 import { AuthRequest } from '../types';
 import { AppError } from './error.middleware';
@@ -17,7 +17,7 @@ export const authenticate = async (
     }
 
     const token = authHeader.substring(7);
-    const decoded = JwtUtil.verifyAccessToken(token);
+    const decoded = JWTUtil.verifyAccessToken(token);
 
     req.user = decoded;
     next();

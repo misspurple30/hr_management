@@ -1,4 +1,6 @@
+import { Request, Response, NextFunction } from 'express';
 import { DashboardService } from '../services/dashboard.service';
+import { ResponseUtil } from '../utils/response.util';
 
 export class DashboardController {
   private dashboardService: DashboardService;
