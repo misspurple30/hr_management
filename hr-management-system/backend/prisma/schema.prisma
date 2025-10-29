@@ -1,0 +1,185 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employee Employee?
+
+  @@map("users")
+}
+
+model Employee {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  employeeId  String   @unique // Code employé (ex: EMP001)
+  firstName   String
+  lastName    String
+  email       String   @unique
+  phone       String?
+  avatar      String?
+  position    String
+  salary      Decimal? @db.Decimal(10, 2)
+  hireDate    DateTime
+  status      EmployeeStatus @default(ACTIVE)
+  
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  announcements Announcement[]
+  schedules     Schedule[]
+
+  @@map("employees")
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  color       String?  // Couleur pour l'UI
+  headCount   Int      @default(0)
+  
+  employees   Employee[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("departments")
+}
+
+model Announcement {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  priority    Priority @default(NORMAL)
+  isPinned    Boolean  @default(false)
+  
+  authorId    String
+  author      Employee @relation(fields: [authorId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("announcements")
+}
+
+model Schedule {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  type        ScheduleType @default(MEETING)
+  
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("schedules")
+}
+
+model JobPosition {
+  id          String   @id @default(uuid())
+  title       String
+  department  String
+  type        JobType  @default(FULL_TIME)
+  urgency     Urgency  @default(NORMAL)
+  status      JobStatus @default(OPEN)
+  description String?
+  requirements String?
+  activeHiring Int     @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("job_positions")
+}
+
+model TalentRequest {
+  id          String   @id @default(uuid())
+  department  String
+  position    String
+  quantity    Int
+  priority    Priority @default(NORMAL)
+  status      RequestStatus @default(PENDING)
+  description String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("talent_requests")
+}
+
+//Enums
+enum UserRole {
+  ADMIN
+  HR_MANAGER
+  USER
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum ScheduleType {
+  MEETING
+  INTERVIEW
+  TRAINING
+  REVIEW
+  OTHER
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERN
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+  ON_HOLD
+}
+
+enum Urgency {
+  NORMAL
+  URGENT
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
