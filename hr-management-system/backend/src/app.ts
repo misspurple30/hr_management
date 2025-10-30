@@ -9,11 +9,11 @@ const app: Application = express();
 
 // Security middleware
 app.use(helmet());
-
-// CORS configuration
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    // CORRECTION : Autorise http://localhost:PORT (n'importe quel port)
+    // avec une expression régulière.
+    origin: /http:\/\/localhost:\d+/, 
     credentials: true,
   })
 );
