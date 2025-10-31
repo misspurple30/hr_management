@@ -1,10 +1,8 @@
-// src/context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import api from '../api';
 
-// Interface pour l'utilisateur
 interface User {
   id: string;
   email: string;
@@ -13,8 +11,6 @@ interface User {
   role: string;
   avatar?: string;
 }
-
-// Types pour les données du contexte
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -45,7 +41,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Au chargement, vérifier si un token est dans le localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken');
     if (storedToken) {
@@ -56,14 +51,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Récupérer les infos de l'utilisateur connecté
   const fetchCurrentUser = async () => {
     try {
       const response = await api.get('/auth/me');
       setUser(response.data.data);
     } catch (error) {
       console.error('Error fetching user:', error);
-      // Si erreur, supprimer le token invalide
       localStorage.removeItem('accessToken');
       setToken(null);
       setUser(null);
@@ -135,7 +128,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Hook personnalisé pour utiliser le contexte
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

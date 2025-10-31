@@ -11,27 +11,23 @@ const app: Application = express();
 app.use(helmet());
 app.use(
   cors({
-    // CORRECTION : Autorise http://localhost:PORT (n'importe quel port)
-    // avec une expression régulière.
     origin: /http:\/\/localhost:\d+/, 
     credentials: true,
   })
 );
 
-// Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, 
+  max: 100, 
   message: 'Too many requests from this IP, please try again later.',
 });
 
 app.use('/api/', limiter);
 
-// Body parser
+// Body
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// API routes
 app.use('/api', routes);
 
 // Root route

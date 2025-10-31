@@ -24,12 +24,10 @@ export const errorHandler = (
     return ResponseUtil.error(res, err.message, err.statusCode);
   }
 
-  // Prisma errors
   if (err.name === 'PrismaClientKnownRequestError') {
     return ResponseUtil.error(res, 'Database error', 400);
   }
-
-  // JWT errors
+  
   if (err.name === 'JsonWebTokenError') {
     return ResponseUtil.unauthorized(res, 'Invalid token');
   }
@@ -38,6 +36,5 @@ export const errorHandler = (
     return ResponseUtil.unauthorized(res, 'Token expired');
   }
 
-  // Default error
   return ResponseUtil.serverError(res, err.message || 'Something went wrong');
 };

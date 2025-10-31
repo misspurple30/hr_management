@@ -49,6 +49,11 @@ export class EmployeeRepository {
     });
   }
 
+async findByUserId(userId: string): Promise<Employee | null> {
+  return prisma.employee.findUnique({
+    where: { userId },
+  });
+}
   async findById(id: string): Promise<Employee | null> {
     return prisma.employee.findUnique({
       where: { id },

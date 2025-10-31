@@ -18,7 +18,7 @@ export class DashboardService {
       prisma.employee.count({
         where: {
           hireDate: {
-            gte: new Date(new Date().setDate(1)), // First day of current month
+            gte: new Date(new Date().setDate(1)), 
           },
         },
       }),

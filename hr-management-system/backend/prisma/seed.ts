@@ -4,9 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting database seed...');
 
-  // Clear existing data
   await prisma.schedule.deleteMany();
   await prisma.announcement.deleteMany();
   await prisma.talentRequest.deleteMany();
@@ -17,10 +15,8 @@ async function main() {
 
   console.log('✅ Cleared existing data');
 
-  // Hash password for all users
   const hashedPassword = await bcrypt.hash('Password123', 10);
 
-  // Create Admin User
   const adminUser = await prisma.user.create({
     data: {
       email: 'admin@wehr.com',
@@ -31,9 +27,6 @@ async function main() {
     },
   });
 
-  console.log('✅ Created admin user');
-
-  // Create Departments
   const departments = await Promise.all([
     prisma.department.create({
       data: {
@@ -74,7 +67,6 @@ async function main() {
 
   console.log('✅ Created departments');
 
-  // Create Users and Employees
   const employeesData = [
     {
       firstName: 'Admira',
@@ -185,7 +177,6 @@ async function main() {
 
   console.log('✅ Created employees');
 
-  // Update department head counts
   for (const dept of departments) {
     const count = await prisma.employee.count({
       where: { departmentId: dept.id },
@@ -196,7 +187,6 @@ async function main() {
     });
   }
 
-  // Create Job Positions
   await prisma.jobPosition.createMany({
     data: [
       {
@@ -236,9 +226,6 @@ async function main() {
     ],
   });
 
-  console.log('✅ Created job positions');
-
-  // Create Talent Requests
   await prisma.talentRequest.createMany({
     data: [
       {
@@ -265,13 +252,10 @@ async function main() {
     ],
   });
 
-  console.log('✅ Created talent requests');
 
-  // Get first employee for announcements and schedules
   const firstEmployee = await prisma.employee.findFirst();
 
   if (firstEmployee) {
-    // Create Announcements
     await prisma.announcement.createMany({
       data: [
         {
@@ -297,16 +281,13 @@ async function main() {
       ],
     });
 
-    console.log('✅ Created announcements');
-
-    // Create Schedules
     const today = new Date();
     await prisma.schedule.createMany({
       data: [
         {
           title: 'Review candidate applications',
           description: 'Review and shortlist candidates for developer position',
-          startTime: new Date(today.getTime() + 2 * 60 * 60 * 1000), // 2 hours from now
+          startTime: new Date(today.getTime() + 2 * 60 * 60 * 1000), 
           endTime: new Date(today.getTime() + 3 * 60 * 60 * 1000),
           type: 'REVIEW',
           employeeId: firstEmployee.id,
@@ -330,14 +311,7 @@ async function main() {
       ],
     });
 
-    console.log('✅ Created schedules');
   }
-
-  console.log('🎉 Database seeded successfully!');
-  console.log('\n📧 Login credentials:');
-  console.log('Admin: admin@wehr.com / Password123');
-  console.log('HR Manager: admira.john@wehr.com / Password123');
-  console.log('Employee: sarah.williams@wehr.com / Password123');
 }
 
 main()

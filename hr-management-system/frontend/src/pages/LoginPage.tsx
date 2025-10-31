@@ -117,27 +117,7 @@ export default function LoginPage() {
                 'Sign In'
               )}
             </button>
-          </form>
-
-          {/* Demo credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs font-semibold text-gray-700 mb-2">Demo Credentials:</p>
-            <div className="space-y-1 text-xs text-gray-600">
-              <p>👤 <strong>Admin:</strong> admin@wehr.com / Password123</p>
-              <p>👥 <strong>HR Manager:</strong> admira.john@wehr.com / Password123</p>
-              <p>💼 <strong>Employee:</strong> sarah.williams@wehr.com / Password123</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
-            <a href="#" className="text-red-600 hover:text-red-700 font-medium">
-              Contact HR
-            </a>
-          </p>
+          </form>          
         </div>
       </div>
     </div>

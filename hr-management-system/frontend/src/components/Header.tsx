@@ -1,6 +1,5 @@
-// src/components/Header.tsx
 import React, { useState, useEffect } from 'react';
-import { FiSearch, FiBell, FiChevronDown, FiMessageSquare } from 'react-icons/fi';
+import { FiSearch, FiBell, FiChevronDown, FiMenu } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
@@ -13,7 +12,11 @@ interface User {
   avatar?: string;
 }
 
-const Header = () => {
+type HeaderProps = {
+  toggleSidebar: () => void;
+};
+
+const Header = ({ toggleSidebar }: HeaderProps) => {
   const { logout } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -49,22 +52,34 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10 shadow-sm">
+    <header className="bg-white border-b border-gray-200 px-4 sm:px-8 py-4 sticky top-0 z-10 shadow-sm">
       <div className="flex items-center justify-between">
-        {/* Barre de recherche */}
-        <div className="flex-1 max-w-md">
-          <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="search"
-              placeholder="Search"
-              className="w-full py-2.5 pl-10 pr-4 text-sm text-gray-700 placeholder-gray-400 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
-            />
-          </div>
-        </div>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={toggleSidebar}
+            className="lg:hidden p-2 text-gray-600 hover:text-red-600 rounded-lg hover:bg-red-50"
+          >
+            <FiMenu size={22} />
+          </button>
 
-        {/* Icônes et Menu Utilisateur */}
-        <div className="flex items-center space-x-4">
+         <div className="flex-1 max-w-md">
+  <div className="relative">
+    <button className="sm:hidden p-2 rounded-lg text-gray-500 hover:text-red-500 transition">
+      <FiSearch size={20} />
+    </button>
+
+    <div className="hidden sm:block relative">
+      <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+      <input
+        type="search"
+        placeholder="Search"
+        className="w-full py-2.5 pl-10 pr-4 text-sm text-gray-700 placeholder-gray-400 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+      />
+    </div>
+  </div>
+</div>
+        </div>
+        <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Notifications */}
           <button 
             onClick={() => setShowNotifications(!showNotifications)}
@@ -73,14 +88,8 @@ const Header = () => {
             <FiBell size={22} />
             <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
           </button>
-
-          {/* Messages */}
-          <button className="relative p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-            <FiMessageSquare size={22} />
-          </button>
-
-          {/* Séparateur vertical */}
-          <div className="h-8 w-px bg-gray-200"></div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square-more-icon lucide-message-square-more"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M12 11h.01"/><path d="M16 11h.01"/><path d="M8 11h.01"/></svg>
+          <div className="h-8 w-px bg-gray-200 hidden sm:block"></div>
 
           {/* Profil utilisateur */}
           {loading ? (
@@ -121,9 +130,8 @@ const Header = () => {
                     {getRoleDisplay(user.role)}
                   </p>
                 </div>
-
                 <FiChevronDown 
-                  className={`text-gray-400 group-hover:text-red-600 transition-all ${
+                  className={`text-gray-400 group-hover:text-red-600 transition-all hidden md:block ${
                     showProfileMenu ? 'rotate-180' : ''
                   }`} 
                   size={18} 
@@ -133,7 +141,6 @@ const Header = () => {
               {/* Dropdown Menu */}
               {showProfileMenu && (
                 <>
-                  {/* Overlay pour fermer le menu */}
                   <div 
                     className="fixed inset-0 z-10"
                     onClick={() => setShowProfileMenu(false)}
@@ -157,12 +164,6 @@ const Header = () => {
                       <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                         👤 My Profile
                       </button>
-                      <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                        ⚙️ Settings
-                      </button>
-                      <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                        🔔 Notifications
-                      </button>
                     </div>
 
                     {/* Logout */}
@@ -174,7 +175,7 @@ const Header = () => {
                         }}
                         className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
                       >
-                        🚪 Déconnexion
+                        Déconnexion
                       </button>
                     </div>
                   </div>

@@ -13,7 +13,6 @@ export class DepartmentService {
   }
 
   async create(data: CreateDepartmentData) {
-    // Check if department name already exists
     if (await this.departmentRepository.existsByName(data.name)) {
       throw new AppError('Department with this name already exists', 400);
     }
@@ -34,13 +33,11 @@ export class DepartmentService {
   }
 
   async update(id: string, data: UpdateDepartmentData) {
-    // Verify department exists
     const existingDepartment = await this.departmentRepository.findById(id);
     if (!existingDepartment) {
       throw new AppError('Department not found', 404);
     }
 
-    // Check if new name already exists
     if (data.name && data.name !== existingDepartment.name) {
       if (await this.departmentRepository.existsByName(data.name, id)) {
         throw new AppError('Department with this name already exists', 400);
@@ -56,7 +53,6 @@ export class DepartmentService {
       throw new AppError('Department not found', 404);
     }
 
-    // Check if department has employees
     if (department._count && department._count.employees > 0) {
       throw new AppError(
         'Cannot delete department with active employees. Please reassign employees first.',

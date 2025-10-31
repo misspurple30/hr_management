@@ -13,12 +13,10 @@ export class JWTUtil {
   private static readonly REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE || '30d';
 
   static generateAccessToken(payload: JwtPayload): string {
-    // Correction : Caster l'objet d'options en 'jwt.SignOptions'
     return jwt.sign(payload, this.SECRET, { expiresIn: this.EXPIRE } as jwt.SignOptions);
   }
 
   static generateRefreshToken(payload: JwtPayload): string {
-    // Correction : Caster l'objet d'options en 'jwt.SignOptions'
     return jwt.sign(payload, this.REFRESH_SECRET, { expiresIn: this.REFRESH_EXPIRE } as jwt.SignOptions);
   }
 

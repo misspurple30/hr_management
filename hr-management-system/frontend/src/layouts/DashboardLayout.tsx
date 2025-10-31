@@ -1,21 +1,20 @@
-// src/layouts/DashboardLayout.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 
 export default function DashboardLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar fixe à gauche */}
-      <Sidebar />
-
-      {/* Contenu principal avec Header */}
-      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
-        {/* Header en haut */}
-        <Header />
-
-        {/* Contenu de la page avec scroll */}
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden">
+        <Header toggleSidebar={toggleSidebar} />
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>

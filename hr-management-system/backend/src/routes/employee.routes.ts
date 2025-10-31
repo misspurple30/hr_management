@@ -15,36 +15,16 @@ const employeeController = new EmployeeController();
 // All routes require authentication
 router.use(authenticate);
 
-/**
- * @route   GET /api/employees/stats
- * @desc    Get employee statistics
- * @access  Private (HR_MANAGER, ADMIN)
- */
 router.get(
   '/stats',
   authorize('HR_MANAGER', 'ADMIN'),
   employeeController.getStats
 );
 
-/**
- * @route   GET /api/employees
- * @desc    Get all employees with filters
- * @access  Private
- */
 router.get('/', validate(listEmployeesValidator), employeeController.findAll);
 
-/**
- * @route   GET /api/employees/:id
- * @desc    Get employee by ID
- * @access  Private
- */
 router.get('/:id', validate(getEmployeeValidator), employeeController.findById);
 
-/**
- * @route   POST /api/employees
- * @desc    Create new employee
- * @access  Private (HR_MANAGER, ADMIN)
- */
 router.post(
   '/',
   authorize('HR_MANAGER', 'ADMIN'),
@@ -52,11 +32,6 @@ router.post(
   employeeController.create
 );
 
-/**
- * @route   PUT /api/employees/:id
- * @desc    Update employee
- * @access  Private (HR_MANAGER, ADMIN)
- */
 router.put(
   '/:id',
   authorize('HR_MANAGER', 'ADMIN'),
@@ -64,11 +39,7 @@ router.put(
   employeeController.update
 );
 
-/**
- * @route   DELETE /api/employees/:id
- * @desc    Delete employee
- * @access  Private (ADMIN)
- */
+
 router.delete(
   '/:id',
   authorize('ADMIN'),

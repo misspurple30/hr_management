@@ -19,8 +19,6 @@ export class DepartmentRepository {
       data,
     });
   }
-
-  // CORRECTION: Le type de retour ": Promise<Department | null>" a été supprimé
   async findById(id: string) {
     return prisma.department.findUnique({
       where: { id },

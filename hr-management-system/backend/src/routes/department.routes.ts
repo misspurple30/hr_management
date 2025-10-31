@@ -11,28 +11,12 @@ import {
 const router = Router();
 const departmentController = new DepartmentController();
 
-// All routes require authentication
 router.use(authenticate);
 
-/**
- * @route   GET /api/departments
- * @desc    Get all departments
- * @access  Private
- */
 router.get('/', departmentController.findAll);
 
-/**
- * @route   GET /api/departments/:id
- * @desc    Get department by ID
- * @access  Private
- */
 router.get('/:id', validate(getDepartmentValidator), departmentController.findById);
 
-/**
- * @route   POST /api/departments
- * @desc    Create new department
- * @access  Private (HR_MANAGER, ADMIN)
- */
 router.post(
   '/',
   authorize('HR_MANAGER', 'ADMIN'),
@@ -40,11 +24,6 @@ router.post(
   departmentController.create
 );
 
-/**
- * @route   PUT /api/departments/:id
- * @desc    Update department
- * @access  Private (HR_MANAGER, ADMIN)
- */
 router.put(
   '/:id',
   authorize('HR_MANAGER', 'ADMIN'),
@@ -52,11 +31,6 @@ router.put(
   departmentController.update
 );
 
-/**
- * @route   DELETE /api/departments/:id
- * @desc    Delete department
- * @access  Private (ADMIN)
- */
 router.delete(
   '/:id',
   authorize('ADMIN'),

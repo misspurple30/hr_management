@@ -25,16 +25,12 @@ export class AuthService {
   async register(data: RegisterData) {
     const { email, password, firstName, lastName } = data;
 
-    // Check if user exists
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw new AppError('User with this email already exists', 400);
     }
 
-    // Hash password
     const hashedPassword = await PasswordUtil.hash(password);
-
-    // Create user
     const user = await this.userRepository.create({
       email,
       password: hashedPassword,
@@ -42,7 +38,7 @@ export class AuthService {
       lastName,
     });
 
-    // Generate tokens
+    // Generation du token
     const payload = {
       id: user.id,
       email: user.email,
@@ -67,20 +63,14 @@ export class AuthService {
 
   async login(data: LoginData) {
     const { email, password } = data;
-
-    // Find user
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new AppError('Invalid email or password', 401);
     }
-
-    // Verify password
     const isPasswordValid = await PasswordUtil.compare(password, user.password);
     if (!isPasswordValid) {
       throw new AppError('Invalid email or password', 401);
     }
-
-    // Generate tokens
     const payload = {
       id: user.id,
       email: user.email,
