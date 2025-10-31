@@ -1,4 +1,3 @@
-import React from 'react';
 import { FiX, FiMail, FiPhone, FiCalendar, FiDollarSign, FiBriefcase, FiUser } from 'react-icons/fi';
 
 interface EmployeeDetailsModalProps {

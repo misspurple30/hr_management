@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../api';
 import { FiX } from 'react-icons/fi';
 
@@ -136,7 +136,8 @@ export default function ScheduleFormModal({ isOpen, onClose, onScheduleCreated }
         endTime: new Date(formData.endTime).toISOString(),
         type: formData.type,
         employeeId: formData.employeeId,
-      };      
+      };
+      console.log('Payload:', payload);
       onScheduleCreated();
       onClose();
       

@@ -295,7 +295,7 @@ async function main() {
         {
           title: 'Interview with candidates',
           description: 'Technical interview with shortlisted candidates',
-          startTime: new Date(today.getTime() + 5 * 60 * 60 * 1000), // 5 hours from now
+          startTime: new Date(today.getTime() + 5 * 60 * 60 * 1000), 
           endTime: new Date(today.getTime() + 6 * 60 * 60 * 1000),
           type: 'INTERVIEW',
           employeeId: firstEmployee.id,
@@ -311,7 +311,14 @@ async function main() {
       ],
     });
 
+    console.log('✅ Created schedules');
   }
+
+  console.log('🎉 Database seeded successfully!');
+  console.log('\n📧 Login credentials:');
+  console.log('Admin: admin@wehr.com / Password123');
+  console.log('HR Manager: admira.john@wehr.com / Password123');
+  console.log('Employee: sarah.williams@wehr.com / Password123');
 }
 
 main()

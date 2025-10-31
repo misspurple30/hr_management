@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api';
-import { FiMoreHorizontal, FiSearch } from 'react-icons/fi';
+import { FiMoreHorizontal } from 'react-icons/fi';
 import ScheduleFormModal from '../components/ScheduleFormModal';
 
 
@@ -105,11 +105,13 @@ export default function DashboardPage() {
       return new Date().toLocaleDateString('fr-FR');
     }
   };
+  console.log(formatDate)
 
   const getTimeLabel = (dateString: string | Date) => {
     try {
       const date = new Date(dateString);
       const now = new Date();
+      console.log(now);
       
       // Format: "Aujourd'hui, 17:40"
       const hours = String(date.getHours()).padStart(2, '0');
