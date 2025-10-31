@@ -1,6 +1,6 @@
 # 🏢 WeHR - Système de Gestion RH
 
-Application web Fullstack de gestion des ressources humaines développée dans le cadre d'un test technique.
+Application web Fullstack de gestion des ressources humaines.
 
 **Stack** : React + TypeScript + Vite | Node.js + Express + Prisma | PostgreSQL | Docker
 
