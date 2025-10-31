@@ -15,7 +15,7 @@ Application web Fullstack de gestion des ressources humaines.
 
 ```bash
 # 1. Cloner le projet
-git clone <repository-url>
+git clone git@github.com:misspurple30/hr_management.git
 cd hr-management-system
 
 # 2. Créer le fichier .env
