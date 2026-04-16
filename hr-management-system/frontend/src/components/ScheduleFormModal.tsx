@@ -63,13 +63,7 @@ export default function ScheduleFormModal({ isOpen, onClose, onScheduleCreated }
     setError(null);
     
     try {
-      console.log('Fetching employees...');
-      console.log('API URL:', api.defaults.baseURL);
-      console.log('Token:', localStorage.getItem('token') ? 'Present' : 'Missing');
-      
       const response = await api.get('/employees');
-      console.log('Response status:', response.status);
-      console.log('Response data:', response.data);
       
       let employeesList = [];
       
@@ -82,8 +76,6 @@ export default function ScheduleFormModal({ isOpen, onClose, onScheduleCreated }
       setEmployees(employeesList);
       
     } catch (err: any) {
-      console.error('Error fetching employees:', err);
-      console.error('Error response:', err.response);
       
       if (err.response?.status === 401) {
         setError('Non authentifié. Veuillez vous reconnecter.');
@@ -119,7 +111,7 @@ export default function ScheduleFormModal({ isOpen, onClose, onScheduleCreated }
       return;
     }
     if (new Date(formData.endTime) <= new Date(formData.startTime)) {
-      setError('');
+      setError('La date de fin doit être après la date de début');
       return;
     }
 
@@ -127,8 +119,6 @@ export default function ScheduleFormModal({ isOpen, onClose, onScheduleCreated }
     setError(null);
 
     try {
-      console.log('Submitting schedule:', formData);
-      
       const payload = {
         title: formData.title,
         description: formData.description,
@@ -137,7 +127,8 @@ export default function ScheduleFormModal({ isOpen, onClose, onScheduleCreated }
         type: formData.type,
         employeeId: formData.employeeId,
       };
-      console.log('Payload:', payload);
+
+      await api.post('/schedules', payload);
       onScheduleCreated();
       onClose();
       

@@ -38,6 +38,13 @@ export class UserRepository {
     });
   }
 
+  async update(id: string, data: { firstName?: string; lastName?: string; password?: string }): Promise<User> {
+    return prisma.user.update({
+      where: { id },
+      data,
+    });
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
     const count = await prisma.user.count({
       where: { email },

@@ -105,14 +105,10 @@ export default function DashboardPage() {
       return new Date().toLocaleDateString('fr-FR');
     }
   };
-  console.log(formatDate)
 
   const getTimeLabel = (dateString: string | Date) => {
     try {
       const date = new Date(dateString);
-      const now = new Date();
-      console.log(now);
-      
       // Format: "Aujourd'hui, 17:40"
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -150,7 +146,7 @@ export default function DashboardPage() {
                 {/* Card 2: Job Open */}
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 rounded-lg p-4">
                   <p className="text-xs font-medium text-gray-600 mb-1">Job Open</p>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">10</p>
+                  <p className="text-3xl font-bold text-gray-900 mb-2">{overview.availablePositions}</p>
                   <p className="text-xs text-blue-600 font-medium">{overview.availablePositions} Active hiring</p>
                 </div>
 

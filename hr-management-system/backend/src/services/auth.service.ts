@@ -101,6 +101,43 @@ export class AuthService {
     return user;
   }
 
+  async updateProfile(userId: string, data: { firstName?: string; lastName?: string }) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    const updated = await this.userRepository.update(userId, data);
+    return {
+      id: updated.id,
+      email: updated.email,
+      firstName: updated.firstName,
+      lastName: updated.lastName,
+      role: updated.role,
+    };
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    const isValid = await PasswordUtil.compare(currentPassword, user.password);
+    if (!isValid) {
+      throw new AppError('Mot de passe actuel incorrect', 400);
+    }
+
+    if (newPassword.length < 6) {
+      throw new AppError('Le nouveau mot de passe doit contenir au moins 6 caractères', 400);
+    }
+
+    const hashedPassword = await PasswordUtil.hash(newPassword);
+    await this.userRepository.update(userId, { password: hashedPassword });
+
+    return { message: 'Password updated successfully' };
+  }
+
   async refreshToken(refreshToken: string) {
     try {
       const decoded = JWTUtil.verifyRefreshToken(refreshToken);

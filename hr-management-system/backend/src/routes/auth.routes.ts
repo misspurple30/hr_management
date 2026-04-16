@@ -13,6 +13,10 @@ router.post('/login', validate(loginValidator), authController.login);
 
 router.get('/me', authenticate, authController.getCurrentUser);
 
+router.put('/me', authenticate, authController.updateProfile);
+
+router.put('/password', authenticate, authController.changePassword);
+
 router.post('/refresh', authController.refreshToken);
 
 export default router;

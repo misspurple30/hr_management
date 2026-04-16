@@ -31,8 +31,8 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
     try {
       const response = await api.get('/auth/me');
       setUser(response.data.data);
-    } catch (error) {
-      console.error('Error fetching user:', error);
+    } catch {
+      // token invalid or expired
     } finally {
       setLoading(false);
     }

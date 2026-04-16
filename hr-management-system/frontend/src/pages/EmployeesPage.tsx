@@ -79,7 +79,6 @@ export default function EmployeesPage() {
         setTotal(result.pagination.total);
       }
     } catch (err: any) {
-      console.error('Error fetching employees:', err);
       setError('Impossible de charger les employés');
     } finally {
       setLoading(false);
@@ -110,8 +109,7 @@ export default function EmployeesPage() {
       await api.delete(`/employees/${id}`);
       fetchEmployees();
     } catch (err: any) {
-      console.error('Error deleting employee:', err);
-      alert('Erreur lors de la suppression');
+      setError('Erreur lors de la suppression');
     }
   };
 

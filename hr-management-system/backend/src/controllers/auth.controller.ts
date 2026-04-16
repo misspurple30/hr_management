@@ -45,6 +45,35 @@ export class AuthController {
     }
   };
 
+  updateProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user) {
+        return ResponseUtil.unauthorized(res);
+      }
+      const { firstName, lastName } = req.body;
+      const user = await this.authService.updateProfile(req.user.id, { firstName, lastName });
+      return ResponseUtil.success(res, user, 'Profile updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  changePassword = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user) {
+        return ResponseUtil.unauthorized(res);
+      }
+      const { currentPassword, newPassword } = req.body;
+      if (!currentPassword || !newPassword) {
+        return ResponseUtil.error(res, 'Current password and new password are required', 400);
+      }
+      const result = await this.authService.changePassword(req.user.id, currentPassword, newPassword);
+      return ResponseUtil.success(res, result, 'Password changed successfully');
+    } catch (error) {
+      next(error);
+    }
+  };
+
   refreshToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { refreshToken } = req.body;

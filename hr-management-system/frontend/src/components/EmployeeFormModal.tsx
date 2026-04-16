@@ -92,8 +92,7 @@ export default function EmployeeFormModal({ isOpen, onClose, onEmployeeSaved, em
       const response = await api.get('/departments');
       const depts = response.data.data?.data || response.data.data || [];
       setDepartments(depts);
-    } catch (err) {
-      console.error('Error loading departments:', err);
+    } catch {
       setError('Impossible de charger les départements');
     } finally {
       setLoadingDepartments(false);
@@ -151,8 +150,6 @@ export default function EmployeeFormModal({ isOpen, onClose, onEmployeeSaved, em
       onEmployeeSaved();
       onClose();
     } catch (err: any) {
-      console.error('Error saving employee:', err);
-      
       if (err.response?.data?.errors) {
         setError(err.response.data.errors.map((e: any) => e.msg).join(', '));
       } else if (err.response?.data?.message) {

@@ -56,9 +56,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await api.get('/auth/me');
       setUser(response.data.data);
-    } catch (error) {
-      console.error('Error fetching user:', error);
+    } catch {
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       setToken(null);
       setUser(null);
     } finally {
@@ -73,10 +73,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         password,
       });
 
-      const { user: userData, accessToken } = response.data.data;
-      
-      // Stocker le token
+      const { user: userData, accessToken, refreshToken } = response.data.data;
+
+      // Stocker les tokens
       localStorage.setItem('accessToken', accessToken);
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
+      }
       setToken(accessToken);
       setUser(userData);
 
@@ -84,7 +87,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       navigate('/');
 
     } catch (error) {
-      console.error('Échec de la connexion:', error);
       if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Email ou mot de passe incorrect');
       } else {
@@ -95,6 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     setToken(null);
     setUser(null);
     navigate('/login');

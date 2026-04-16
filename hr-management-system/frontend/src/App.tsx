@@ -4,6 +4,11 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import EmployeesPage from './pages/EmployeesPage';
+import DepartmentsPage from './pages/DepartmentsPage';
+import SchedulePage from './pages/SchedulePage';
+import RecruitmentPage from './pages/RecruitmentPage';
+import SettingsPage from './pages/SettingsPage';
+import SupportPage from './pages/SupportPage';
 
 const LoginRoute = () => {
   const { isAuthenticated } = useAuth();
@@ -20,7 +25,11 @@ function AppRoutes() {
         <Route index element={<DashboardPage />} /> 
         
         <Route path="/employees" element={<EmployeesPage />} />
-        <Route path="/departments" element={<div>Page Départements </div>} />
+        <Route path="/departments" element={<DepartmentsPage />} />
+        <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/recruitment" element={<RecruitmentPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/support" element={<SupportPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
