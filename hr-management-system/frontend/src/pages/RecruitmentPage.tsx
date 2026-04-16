@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
 import { FiBriefcase, FiUsers, FiClock, FiTrendingUp, FiAlertCircle } from 'react-icons/fi';
+import Card from '../components/ui/Card';
+import Badge from '../components/ui/Badge';
+import Button from '../components/ui/Button';
+import { PageSkeleton } from '../components/ui/Skeleton';
+import ErrorState from '../components/ui/ErrorState';
+import EmptyState from '../components/ui/EmptyState';
 
 interface JobPosition {
   id: string;
@@ -43,13 +49,13 @@ const JOB_TYPE_LABELS: Record<string, string> = {
   INTERN: 'Stage',
 };
 
-const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
-  OPEN: { bg: 'bg-green-50', text: 'text-green-700' },
-  CLOSED: { bg: 'bg-gray-100', text: 'text-gray-600' },
-  ON_HOLD: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
-  PENDING: { bg: 'bg-blue-50', text: 'text-blue-700' },
-  APPROVED: { bg: 'bg-green-50', text: 'text-green-700' },
-  REJECTED: { bg: 'bg-red-50', text: 'text-red-700' },
+const STATUS_BADGE_VARIANT: Record<string, 'success' | 'default' | 'warning' | 'info' | 'error'> = {
+  OPEN: 'success',
+  CLOSED: 'default',
+  ON_HOLD: 'warning',
+  PENDING: 'info',
+  APPROVED: 'success',
+  REJECTED: 'error',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -61,11 +67,11 @@ const STATUS_LABELS: Record<string, string> = {
   REJECTED: 'Refusé',
 };
 
-const PRIORITY_STYLES: Record<string, { bg: string; text: string }> = {
-  LOW: { bg: 'bg-gray-100', text: 'text-gray-600' },
-  NORMAL: { bg: 'bg-blue-50', text: 'text-blue-700' },
-  HIGH: { bg: 'bg-orange-50', text: 'text-orange-700' },
-  URGENT: { bg: 'bg-red-50', text: 'text-red-700' },
+const PRIORITY_BADGE_VARIANT: Record<string, 'default' | 'info' | 'warning' | 'error'> = {
+  LOW: 'default',
+  NORMAL: 'info',
+  HIGH: 'warning',
+  URGENT: 'error',
 };
 
 export default function RecruitmentPage() {
@@ -93,130 +99,112 @@ export default function RecruitmentPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen w-full bg-white">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-lg text-gray-500">Chargement...</p>
-        </div>
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   if (error || !data) {
-    return (
-      <div className="flex items-center justify-center h-screen w-full bg-white">
-        <div className="text-center">
-          <FiAlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
-          <p className="text-lg text-gray-700 font-medium mb-2">Erreur</p>
-          <p className="text-sm text-gray-500 mb-4">{error}</p>
-          <button onClick={fetchData} className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700">
-            Réessayer
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorState message={error || 'Données non disponibles'} onRetry={fetchData} />;
   }
 
   const { jobPositions = [], talentRequests = [], overview } = data;
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-gray-50">
-      <div className="max-w-7xl mx-auto p-4 lg:p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Recrutement</h1>
-        <p className="text-sm text-gray-500 mb-8">Gestion des postes ouverts et demandes de talents</p>
+    <div className="w-full h-full overflow-y-auto bg-neutral-50">
+      <div className="max-w-7xl mx-auto p-4 lg:p-8 animate-fade-in">
+        <h1 className="text-3xl font-bold text-neutral-900 mb-2">Recrutement</h1>
+        <p className="text-sm text-neutral-500 mb-8">Gestion des postes ouverts et demandes de talents</p>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          <Card padding="md">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                <FiBriefcase className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-info-50 rounded-xl flex items-center justify-center">
+                <FiBriefcase className="w-5 h-5 text-info-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{overview.availablePositions}</p>
-                <p className="text-xs text-gray-500">Postes ouverts</p>
+                <p className="text-2xl font-bold text-neutral-900">{overview.availablePositions}</p>
+                <p className="text-xs text-neutral-500">Postes ouverts</p>
               </div>
             </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          </Card>
+          <Card padding="md">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
-                <FiAlertCircle className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 bg-error-50 rounded-xl flex items-center justify-center">
+                <FiAlertCircle className="w-5 h-5 text-error-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{overview.urgentlyNeeded}</p>
-                <p className="text-xs text-gray-500">Urgents</p>
+                <p className="text-2xl font-bold text-neutral-900">{overview.urgentlyNeeded}</p>
+                <p className="text-xs text-neutral-500">Urgents</p>
               </div>
             </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          </Card>
+          <Card padding="md">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-                <FiUsers className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center">
+                <FiUsers className="w-5 h-5 text-primary-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{overview.talentRequests}</p>
-                <p className="text-xs text-gray-500">Demandes de talents</p>
+                <p className="text-2xl font-bold text-neutral-900">{overview.talentRequests}</p>
+                <p className="text-xs text-neutral-500">Demandes de talents</p>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-white rounded-lg shadow-sm p-1 mb-6">
-          <button
-            onClick={() => setActiveTab('positions')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors flex-1 justify-center ${
-              activeTab === 'positions' ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <FiBriefcase size={16} />
-            Postes ({jobPositions.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('requests')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors flex-1 justify-center ${
-              activeTab === 'requests' ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <FiTrendingUp size={16} />
-            Demandes ({talentRequests.length})
-          </button>
-        </div>
+        <Card padding="none" className="p-1 mb-6">
+          <div className="flex gap-1">
+            <Button
+              variant={activeTab === 'positions' ? 'primary' : 'ghost'}
+              onClick={() => setActiveTab('positions')}
+              icon={<FiBriefcase size={16} />}
+              className="flex-1"
+            >
+              Postes ({jobPositions.length})
+            </Button>
+            <Button
+              variant={activeTab === 'requests' ? 'primary' : 'ghost'}
+              onClick={() => setActiveTab('requests')}
+              icon={<FiTrendingUp size={16} />}
+              className="flex-1"
+            >
+              Demandes ({talentRequests.length})
+            </Button>
+          </div>
+        </Card>
 
         {/* Job Positions Tab */}
         {activeTab === 'positions' && (
           <>
             {jobPositions.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <FiBriefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-lg font-medium text-gray-400">Aucun poste ouvert</p>
-              </div>
+              <EmptyState
+                icon={<FiBriefcase className="w-12 h-12" />}
+                title="Aucun poste ouvert"
+              />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {jobPositions.map((job) => {
-                  const statusStyle = STATUS_STYLES[job.status] || STATUS_STYLES.OPEN;
+                  const badgeVariant = STATUS_BADGE_VARIANT[job.status] || 'success';
                   return (
-                    <div key={job.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <Card key={job.id} hover padding="md">
                       <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-sm font-semibold text-gray-900">{job.title}</h3>
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${statusStyle.bg} ${statusStyle.text}`}>
+                        <h3 className="text-sm font-semibold text-neutral-900">{job.title}</h3>
+                        <Badge variant={badgeVariant}>
                           {STATUS_LABELS[job.status] || job.status}
-                        </span>
+                        </Badge>
                       </div>
 
                       <div className="space-y-2 mb-4">
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-2 text-xs text-neutral-500">
                           <FiBriefcase className="w-3.5 h-3.5" />
                           <span>{job.department}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-2 text-xs text-neutral-500">
                           <FiClock className="w-3.5 h-3.5" />
                           <span>{JOB_TYPE_LABELS[job.type] || job.type}</span>
                         </div>
                         {job.activeHiring > 0 && (
-                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <div className="flex items-center gap-2 text-xs text-neutral-500">
                             <FiUsers className="w-3.5 h-3.5" />
                             <span>{job.activeHiring} candidature(s) active(s)</span>
                           </div>
@@ -224,18 +212,18 @@ export default function RecruitmentPage() {
                       </div>
 
                       {job.urgency === 'URGENT' && (
-                        <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-red-50 rounded-md">
-                          <FiAlertCircle className="w-3.5 h-3.5 text-red-600" />
-                          <span className="text-xs font-medium text-red-700">Recrutement urgent</span>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-error-50 rounded-lg">
+                          <FiAlertCircle className="w-3.5 h-3.5 text-error-600" />
+                          <span className="text-xs font-medium text-error-700">Recrutement urgent</span>
                         </div>
                       )}
 
-                      <div className="mt-4 pt-3 border-t border-gray-100">
-                        <p className="text-xs text-gray-400">
+                      <div className="mt-4 pt-3 border-t border-neutral-100">
+                        <p className="text-xs text-neutral-400">
                           Publié le {new Date(job.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                         </p>
                       </div>
-                    </div>
+                    </Card>
                   );
                 })}
               </div>
@@ -247,43 +235,41 @@ export default function RecruitmentPage() {
         {activeTab === 'requests' && (
           <>
             {talentRequests.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <FiUsers className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-lg font-medium text-gray-400">Aucune demande de talent</p>
-              </div>
+              <EmptyState
+                icon={<FiUsers className="w-12 h-12" />}
+                title="Aucune demande de talent"
+              />
             ) : (
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <Card padding="none" className="overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-neutral-50 border-b border-neutral-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Département</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Poste</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantité</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Priorité</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Département</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Poste</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Quantité</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Priorité</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Statut</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase">Date</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-neutral-200">
                     {talentRequests.map((req) => {
-                      const statusStyle = STATUS_STYLES[req.status] || STATUS_STYLES.PENDING;
-                      const priorityStyle = PRIORITY_STYLES[req.priority] || PRIORITY_STYLES.NORMAL;
+                      const statusVariant = STATUS_BADGE_VARIANT[req.status] || 'info';
+                      const priorityVariant = PRIORITY_BADGE_VARIANT[req.priority] || 'info';
                       return (
-                        <tr key={req.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">{req.department}</td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{req.position}</td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{req.quantity}</td>
+                        <tr key={req.id} className="hover:bg-neutral-50 transition-colors">
+                          <td className="px-6 py-4 text-sm font-medium text-neutral-900">{req.department}</td>
+                          <td className="px-6 py-4 text-sm text-neutral-600">{req.position}</td>
+                          <td className="px-6 py-4 text-sm text-neutral-600">{req.quantity}</td>
                           <td className="px-6 py-4">
-                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${priorityStyle.bg} ${priorityStyle.text}`}>
-                              {req.priority}
-                            </span>
+                            <Badge variant={priorityVariant}>{req.priority}</Badge>
                           </td>
                           <td className="px-6 py-4">
-                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${statusStyle.bg} ${statusStyle.text}`}>
+                            <Badge variant={statusVariant}>
                               {STATUS_LABELS[req.status] || req.status}
-                            </span>
+                            </Badge>
                           </td>
-                          <td className="px-6 py-4 text-xs text-gray-500">
+                          <td className="px-6 py-4 text-xs text-neutral-500">
                             {new Date(req.createdAt).toLocaleDateString('fr-FR')}
                           </td>
                         </tr>
@@ -291,7 +277,7 @@ export default function RecruitmentPage() {
                     })}
                   </tbody>
                 </table>
-              </div>
+              </Card>
             )}
           </>
         )}

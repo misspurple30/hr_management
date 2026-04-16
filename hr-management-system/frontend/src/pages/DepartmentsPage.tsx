@@ -3,6 +3,11 @@ import api from '../api';
 import { FiPlus, FiEdit2, FiTrash2, FiUsers, FiSearch } from 'react-icons/fi';
 import DepartmentFormModal from '../components/DepartmentFormModal';
 import { useAuth } from '../context/AuthContext';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import { PageSkeleton } from '../components/ui/Skeleton';
+import EmptyState from '../components/ui/EmptyState';
 
 interface Department {
   id: string;
@@ -80,78 +85,64 @@ export default function DepartmentsPage() {
   );
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen w-full bg-white">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-lg text-gray-500">Chargement des départements...</p>
-        </div>
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   return (
     <>
-      <div className="w-full h-full overflow-y-auto bg-gray-50">
+      <div className="w-full h-full overflow-y-auto bg-neutral-50 animate-fade-in">
         <div className="max-w-7xl mx-auto p-4 lg:p-8">
 
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Départements</h1>
-              <p className="text-sm text-gray-500 mt-1">{departments.length} département(s) au total</p>
+              <h1 className="text-3xl font-bold text-neutral-900">Départements</h1>
+              <p className="text-sm text-neutral-500 mt-1">{departments.length} département(s) au total</p>
             </div>
             {canManage && (
-              <button
-                onClick={handleCreate}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                <FiPlus size={20} />
+              <Button variant="primary" icon={<FiPlus size={20} />} onClick={handleCreate}>
                 Ajouter un département
-              </button>
+              </Button>
             )}
           </div>
 
           {/* Search */}
-          <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="relative max-w-md">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
+          <Card padding="sm" className="mb-6">
+            <div className="max-w-md">
+              <Input
                 type="text"
                 placeholder="Rechercher un département..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                icon={<FiSearch size={16} />}
               />
             </div>
-          </div>
+          </Card>
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="bg-error-50 border border-error-200 rounded-xl p-4 mb-6">
+              <p className="text-sm text-error-600">{error}</p>
             </div>
           )}
 
           {/* Department Cards */}
           {filteredDepartments.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-              <div className="text-gray-400">
-                <FiUsers className="w-12 h-12 mx-auto mb-3" />
-                <p className="text-lg font-medium mb-1">Aucun département trouvé</p>
-                <p className="text-sm">
-                  {searchTerm ? 'Essayez une autre recherche' : 'Commencez par créer un département'}
-                </p>
-              </div>
-            </div>
+            <EmptyState
+              icon={<FiUsers className="w-12 h-12" />}
+              title="Aucun département trouvé"
+              description={searchTerm ? 'Essayez une autre recherche' : 'Commencez par créer un département'}
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredDepartments.map((dept) => {
                 const employeeCount = dept._count?.employees ?? dept.headCount;
                 return (
-                  <div
+                  <Card
                     key={dept.id}
-                    className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                    hover
+                    padding="none"
+                    className="overflow-hidden"
                   >
                     {/* Color bar */}
                     <div className="h-2" style={{ backgroundColor: dept.color || '#3b82f6' }} />
@@ -160,14 +151,14 @@ export default function DepartmentsPage() {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div
-                            className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm"
                             style={{ backgroundColor: dept.color || '#3b82f6' }}
                           >
                             {dept.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <h3 className="text-base font-semibold text-gray-900">{dept.name}</h3>
-                            <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                            <h3 className="text-base font-semibold text-neutral-900">{dept.name}</h3>
+                            <p className="text-xs text-neutral-500 flex items-center gap-1 mt-0.5">
                               <FiUsers className="w-3 h-3" />
                               {employeeCount} employé{employeeCount !== 1 ? 's' : ''}
                             </p>
@@ -178,7 +169,7 @@ export default function DepartmentsPage() {
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleEdit(dept)}
-                              className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                              className="p-2 text-warning-600 hover:bg-warning-50 rounded-lg transition-colors"
                               title="Modifier"
                             >
                               <FiEdit2 size={16} />
@@ -186,7 +177,7 @@ export default function DepartmentsPage() {
                             {user?.role === 'ADMIN' && (
                               <button
                                 onClick={() => handleDelete(dept.id)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-error-600 hover:bg-error-50 rounded-lg transition-colors"
                                 title="Supprimer"
                               >
                                 <FiTrash2 size={16} />
@@ -197,18 +188,18 @@ export default function DepartmentsPage() {
                       </div>
 
                       {dept.description && (
-                        <p className="text-sm text-gray-600 line-clamp-2">{dept.description}</p>
+                        <p className="text-sm text-neutral-600 line-clamp-2">{dept.description}</p>
                       )}
 
-                      <div className="mt-4 pt-3 border-t border-gray-100">
-                        <div className="flex items-center justify-between text-xs text-gray-400">
+                      <div className="mt-4 pt-3 border-t border-neutral-100">
+                        <div className="flex items-center justify-between text-xs text-neutral-400">
                           <span>
                             Créé le {new Date(dept.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                           </span>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 );
               })}
             </div>

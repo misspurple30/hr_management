@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { FiX } from 'react-icons/fi';
+import Modal from './ui/Modal';
+import Button from './ui/Button';
+import Input from './ui/Input';
+import Select from './ui/Select';
 
 interface EmployeeFormModalProps {
   isOpen: boolean;
@@ -51,7 +54,7 @@ export default function EmployeeFormModal({ isOpen, onClose, onEmployeeSaved, em
   useEffect(() => {
     if (isOpen) {
       fetchDepartments();
-      
+
       if (employee) {
         setFormData({
           firstName: employee.firstName || '',
@@ -162,230 +165,171 @@ export default function EmployeeFormModal({ isOpen, onClose, onEmployeeSaved, em
     }
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={onClose}
+        disabled={isSubmitting}
+      >
+        Annuler
+      </Button>
+      <Button
+        type="submit"
+        form="employee-form"
+        variant="primary"
+        loading={isSubmitting}
+        disabled={isSubmitting || loadingDepartments}
+      >
+        {isEditMode ? 'Mettre à jour' : 'Créer'}
+      </Button>
+    </>
+  );
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {isEditMode ? 'Modifier l\'employé' : 'Ajouter un employé'}
-          </h3>
-          <button onClick={onClose} className="p-1 text-gray-500 hover:text-red-600 rounded-full transition-colors">
-            <FiX size={22} />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={isEditMode ? 'Modifier l\'employé' : 'Ajouter un employé'}
+      size="lg"
+      footer={footerContent}
+    >
+      <form id="employee-form" onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Name Row */}
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Prénom"
+            type="text"
+            id="firstName"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            label="Nom"
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            required
+          />
         </div>
 
-        {/* Form */}
-        <form id="employee-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
-          
-          {/* Name Row */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                Prénom <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
+        {/* Email & Phone */}
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Email"
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            label="Téléphone"
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+          />
+        </div>
 
-            <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                Nom <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-          </div>
+        {/* Position & Department */}
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Poste"
+            type="text"
+            id="position"
+            name="position"
+            value={formData.position}
+            onChange={handleChange}
+            required
+          />
+          <Select
+            label="Département"
+            id="departmentId"
+            name="departmentId"
+            value={formData.departmentId}
+            onChange={handleChange}
+            required
+            disabled={loadingDepartments}
+          >
+            <option value="">Sélectionner...</option>
+            {departments.map(dept => (
+              <option key={dept.id} value={dept.id}>
+                {dept.name}
+              </option>
+            ))}
+          </Select>
+        </div>
 
-          {/* Email & Phone */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
+        {/* Hire Date & Salary */}
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Date d'embauche"
+            type="date"
+            id="hireDate"
+            name="hireDate"
+            value={formData.hireDate}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            label="Salaire"
+            type="number"
+            id="salary"
+            name="salary"
+            value={formData.salary}
+            onChange={handleChange}
+            min="0"
+            step="0.01"
+          />
+        </div>
 
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Téléphone
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-          </div>
+        {/* Status */}
+        <Select
+          label="Statut"
+          id="status"
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+          required
+        >
+          <option value="ACTIVE">Actif</option>
+          <option value="INACTIVE">Inactif</option>
+          <option value="ON_LEAVE">En congé</option>
+        </Select>
 
-          {/* Position & Department */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-1">
-                Poste <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="position"
-                name="position"
-                value={formData.position}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700 mb-1">
-                Département <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="departmentId"
-                name="departmentId"
-                value={formData.departmentId}
-                onChange={handleChange}
-                required
-                disabled={loadingDepartments}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-100"
-              >
-                <option value="">Sélectionner...</option>
-                {departments.map(dept => (
-                  <option key={dept.id} value={dept.id}>
-                    {dept.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Hire Date & Salary */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="hireDate" className="block text-sm font-medium text-gray-700 mb-1">
-                Date d'embauche <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                id="hireDate"
-                name="hireDate"
-                value={formData.hireDate}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="salary" className="block text-sm font-medium text-gray-700 mb-1">
-                Salaire
-              </label>
-              <input
-                type="number"
-                id="salary"
-                name="salary"
-                value={formData.salary}
-                onChange={handleChange}
-                min="0"
-                step="0.01"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-          </div>
-
-          {/* Status */}
+        {/* Password (only for creation) */}
+        {!isEditMode && (
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
-              Statut <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
+            <Input
+              label="Mot de passe"
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              <option value="ACTIVE">Actif</option>
-              <option value="INACTIVE">Inactif</option>
-              <option value="ON_LEAVE">En congé</option>
-            </select>
+              required={!isEditMode}
+              minLength={6}
+            />
+            <p className="text-xs text-neutral-500 mt-1">Minimum 6 caractères</p>
           </div>
+        )}
 
-          {/* Password (only for creation) */}
-          {!isEditMode && (
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Mot de passe <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required={!isEditMode}
-                minLength={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-              <p className="text-xs text-gray-500 mt-1">Minimum 6 caractères</p>
-            </div>
-          )}
-
-          {/* Error message */}
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-        </form>
-
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-4 border-t bg-gray-50">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
-          >
-            Annuler
-          </button>
-          <button
-            type="submit"
-            form="employee-form"
-            disabled={isSubmitting || loadingDepartments}
-            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-red-400"
-          >
-            {isSubmitting ? 'Enregistrement...' : isEditMode ? 'Mettre à jour' : 'Créer'}
-          </button>
-        </div>
-      </div>
-    </div>
+        {/* Error message */}
+        {error && (
+          <div className="p-3 bg-error-50 border border-error-200 rounded-lg">
+            <p className="text-sm text-error-600">{error}</p>
+          </div>
+        )}
+      </form>
+    </Modal>
   );
 }

@@ -11,7 +11,7 @@ export default function DashboardLayout() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-neutral-50">
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div className="flex-1 flex flex-col lg:ml-64 overflow-hidden">
         <Header toggleSidebar={toggleSidebar} />
