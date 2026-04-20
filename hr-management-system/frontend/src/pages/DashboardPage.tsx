@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
-import { FiMoreHorizontal, FiCalendar } from 'react-icons/fi';
+import { FiMoreHorizontal, FiCalendar, FiTrendingUp } from 'react-icons/fi';
 import ScheduleFormModal from '../components/ScheduleFormModal';
 import { PageSkeleton } from '../components/ui/Skeleton';
 import ErrorState from '../components/ui/ErrorState';
@@ -8,7 +8,6 @@ import EmptyState from '../components/ui/EmptyState';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
-
 
 interface DashboardStats {
   overview: {
@@ -36,13 +35,11 @@ export default function DashboardPage() {
     try {
       setLoading(true);
       const response = await api.get('/dashboard/stats');
-
       if (response.data && response.data.data) {
         setStats(response.data.data);
       } else {
         throw new Error('Format de réponse invalide');
       }
-
       setError(null);
     } catch (error) {
       setError('Impossible de charger les statistiques du dashboard');
@@ -59,15 +56,13 @@ export default function DashboardPage() {
     fetchDashboardStats();
   };
 
-  if (loading) {
-    return <PageSkeleton />;
-  }
+  if (loading) return <PageSkeleton />;
 
   if (error || !stats) {
     return (
-      <div className="flex items-center justify-center h-screen w-full overflow-hidden bg-neutral-50">
+      <div className="flex items-center justify-center h-screen w-full bg-neutral-50">
         <ErrorState
-          message={error || 'Impossible de charger les statistiques du dashboard'}
+          message={error || 'Impossible de charger les statistiques'}
           onRetry={fetchDashboardStats}
         />
       </div>
@@ -79,268 +74,208 @@ export default function DashboardPage() {
   const formatTime = (dateString: string | Date) => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleTimeString('fr-FR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
-    } catch {
-      return 'N/A';
-    }
-  };
-
-  const formatDate = (dateString: string | Date) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleString('fr-FR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-    } catch {
-      return new Date().toLocaleDateString('fr-FR');
-    }
+      return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    } catch { return 'N/A'; }
   };
 
   const getTimeLabel = (dateString: string | Date) => {
-    try {
-      const date = new Date(dateString);
-      // Format: "Aujourd'hui, 17:40"
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-
-      return `Aujourd'hui, ${hours}:${minutes}`;
-    } catch {
-      return 'N/A';
-    }
+    const date = new Date(dateString);
+    return `Aujourd'hui, ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   };
 
-  const prioritySchedules = upcomingSchedules.filter((s) =>
-    s.type === 'REVIEW' || s.type === 'INTERVIEW'
-  );
-
-  const otherSchedules = upcomingSchedules.filter((s) =>
-    s.type !== 'REVIEW' && s.type !== 'INTERVIEW'
-  );
+  const prioritySchedules = upcomingSchedules.filter(s => s.type === 'REVIEW' || s.type === 'INTERVIEW');
+  const otherSchedules = upcomingSchedules.filter(s => s.type !== 'REVIEW' && s.type !== 'INTERVIEW');
 
   return (
-    <>
-      <div className="w-full h-full overflow-y-auto bg-neutral-50 animate-fade-in">
-        <div className="max-w-7xl mx-auto p-4 lg:p-8">
-          <h1 className="text-3xl font-bold text-neutral-900 mb-8">Dashboard</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            <div className="lg:col-span-2 space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="min-h-screen bg-[#FDFDFF] text-neutral-900 font-sans pb-10">
+      <div className="max-w-[1440px] mx-auto px-6 py-8 lg:px-10">
+        
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-neutral-900">Dashboard</h1>
+            <p className="text-neutral-500 font-medium">Bon retour ! Voici ce qui se passe aujourd'hui.</p>
+          </div>
+          <Button 
+            variant="primary" 
+            onClick={() => setIsModalOpen(true)}
+            className="px-8 py-3 shadow-xl shadow-primary-100 rounded-2xl"
+          >
+            + Nouveau Planning
+          </Button>
+        </header>
 
-                {/* Card 1: Available Position */}
-                <Card padding="sm" className="bg-gradient-to-br from-warning-50 to-warning-100 border-warning-200">
-                  <p className="text-xs font-medium text-neutral-600 mb-1">Available Position</p>
-                  <p className="text-3xl font-bold text-neutral-900 mb-2">{overview.availablePositions}</p>
-                  <Badge variant="error" dot>{overview.urgentlyNeeded} Urgently needed</Badge>
-                </Card>
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          
+          {/* Main Column */}
+          <div className="xl:col-span-8 space-y-8">
+            
+            {/* High-Level Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <Card className="border-none bg-orange-50/50 p-6 rounded-[2rem] transition-hover hover:shadow-lg">
+                <h3 className="text-sm font-bold text-orange-600/80 uppercase tracking-widest mb-2">Available</h3>
+                <p className="text-4xl font-black mb-4">{overview.availablePositions}</p>
+                <Badge variant="error" dot className="bg-white/80">{overview.urgentlyNeeded} Urgent</Badge>
+              </Card>
 
-                {/* Card 2: Job Open */}
-                <Card padding="sm" className="bg-gradient-to-br from-info-50 to-info-100 border-info-200">
-                  <p className="text-xs font-medium text-neutral-600 mb-1">Job Open</p>
-                  <p className="text-3xl font-bold text-neutral-900 mb-2">{overview.availablePositions}</p>
-                  <Badge variant="info" dot>{overview.availablePositions} Active hiring</Badge>
-                </Card>
+              <Card className="border-none bg-blue-50/50 p-6 rounded-[2rem] transition-hover hover:shadow-lg">
+                <h3 className="text-sm font-bold text-blue-600/80 uppercase tracking-widest mb-2">Job Open</h3>
+                <p className="text-4xl font-black mb-4">{overview.availablePositions}</p>
+                <Badge variant="info" dot className="bg-white/80">Active Hiring</Badge>
+              </Card>
 
-                {/* Card 3: New Employees */}
-                <Card padding="sm" className="bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200">
-                  <p className="text-xs font-medium text-neutral-600 mb-1">New Employees</p>
-                  <p className="text-3xl font-bold text-neutral-900 mb-2">{overview.newEmployees}</p>
-                  <Badge variant="primary" dot>{overview.newEmployees} Department</Badge>
-                </Card>
-              </div>
-
-              {/* Row 2: Total Employees + Talent Request */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                {/* Total Employees */}
-                <Card hover>
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="text-xs font-medium text-neutral-500 mb-1">Total Employees</p>
-                      <p className="text-3xl font-bold text-neutral-900">{overview.totalEmployees}</p>
-                    </div>
-                    {/* Mini graph placeholder */}
-                    <svg className="w-16 h-10 flex-shrink-0" viewBox="0 0 64 40">
-                      <path d="M 0 30 Q 16 25 32 20 T 64 10" fill="none" stroke="var(--color-primary-500)" strokeWidth="2"/>
-                      <text x="50" y="8" fill="var(--color-primary-500)" fontSize="10">+8%</text>
-                    </svg>
-                  </div>
-                  <div className="space-y-0.5 text-xs text-neutral-600">
-                    <p>102 Men</p>
-                    <p>56 Women</p>
-                  </div>
-                  <p className="text-xs text-primary-600 font-medium mt-2">+2% Past month</p>
-                </Card>
-
-                {/* Talent Request */}
-                <Card hover>
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="text-xs font-medium text-neutral-500 mb-1">Talent Request</p>
-                      <p className="text-3xl font-bold text-neutral-900">{overview.talentRequests}</p>
-                    </div>
-                    {/* Mini graph placeholder */}
-                    <svg className="w-16 h-10 flex-shrink-0" viewBox="0 0 64 40">
-                      <path d="M 0 30 Q 16 25 32 20 T 64 10" fill="none" stroke="var(--color-primary-500)" strokeWidth="2"/>
-                      <text x="50" y="8" fill="var(--color-primary-500)" fontSize="10">+8%</text>
-                    </svg>
-                  </div>
-                  <div className="space-y-0.5 text-xs text-neutral-600">
-                    <p>6 Men</p>
-                    <p>10 Women</p>
-                  </div>
-                  <p className="text-xs text-primary-600 font-medium mt-2">+5% Past month</p>
-                </Card>
-              </div>
-
-              {/* Announcements Section */}
-              <Card padding="lg">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-neutral-900">Announcement</h3>
-                  <span className="text-xs text-neutral-500">{getTimeLabel(new Date())}</span>
-                </div>
-
-                <div className="space-y-3">
-                  {announcements && announcements.length > 0 ? (
-                    announcements.slice(0, 3).map((item) => (
-                      <div key={item.id} className="flex items-start justify-between p-3 border border-neutral-100 rounded-xl hover:bg-neutral-50 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-neutral-900 mb-1 truncate">{item.title || 'Sans titre'}</p>
-                          <p className="text-xs text-neutral-500">
-                            {formatTime(item.createdAt || new Date())}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                          <Button variant="ghost" size="sm" className="p-1">
-                            <FiMoreHorizontal className="w-4 h-4 text-neutral-500" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <EmptyState
-                      icon={<FiCalendar className="w-8 h-8" />}
-                      title="Aucune annonce disponible"
-                    />
-                  )}
-                </div>
-
-                {announcements && announcements.length > 0 && (
-                  <div className="mt-4 text-center">
-                    <Button variant="ghost" size="sm" className="text-primary-600 hover:text-primary-700">
-                      See All Announcement
-                    </Button>
-                  </div>
-                )}
+              <Card className="border-none bg-purple-50/50 p-6 rounded-[2rem] transition-hover hover:shadow-lg">
+                <h3 className="text-sm font-bold text-purple-600/80 uppercase tracking-widest mb-2">New Staff</h3>
+                <p className="text-4xl font-black mb-4">{overview.newEmployees}</p>
+                <Badge variant="primary" dot className="bg-white/80">Department</Badge>
               </Card>
             </div>
 
-            <div className="space-y-6">
+            {/* Metrics Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card hover className="p-8 border-neutral-100 rounded-[2.5rem]">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <p className="text-neutral-500 font-bold text-sm uppercase tracking-wider mb-1">Total Employees</p>
+                    <h2 className="text-5xl font-black">{overview.totalEmployees}</h2>
+                  </div>
+                  <div className="text-emerald-500 flex items-center gap-1 font-black text-sm bg-emerald-50 px-3 py-1 rounded-full">
+                    <FiTrendingUp /> +2%
+                  </div>
+                </div>
+                <div className="flex gap-6 text-xs font-bold text-neutral-400">
+                  <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary-500" /> 102 Men</span>
+                  <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-orange-400" /> 56 Women</span>
+                </div>
+              </Card>
 
-              {/* Recently Activity */}
-              <Card padding="lg" className="bg-gradient-to-br from-surface-dark to-neutral-900 text-white border-transparent">
-                <h3 className="text-sm font-semibold mb-3">Recently Activity</h3>
-                <p className="text-xs text-neutral-300 mb-2">
-                  {getTimeLabel(new Date())}
-                </p>
-                <p className="text-sm font-semibold mb-2">You Posted a New Job</p>
-                <p className="text-xs text-neutral-300 mb-4">
+              <Card hover className="p-8 border-neutral-100 rounded-[2.5rem]">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <p className="text-neutral-500 font-bold text-sm uppercase tracking-wider mb-1">Talent Requests</p>
+                    <h2 className="text-5xl font-black">{overview.talentRequests}</h2>
+                  </div>
+                  <div className="text-emerald-500 flex items-center gap-1 font-black text-sm bg-emerald-50 px-3 py-1 rounded-full">
+                    <FiTrendingUp /> +5%
+                  </div>
+                </div>
+                <div className="flex gap-6 text-xs font-bold text-neutral-400">
+                  <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary-500" /> 6 Men</span>
+                  <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-orange-400" /> 10 Women</span>
+                </div>
+              </Card>
+            </div>
+
+            {/* Announcements */}
+            <Card className="rounded-[2.5rem] border-neutral-100 overflow-hidden">
+              <div className="p-8 border-b border-neutral-50 flex justify-between items-center bg-neutral-50/30">
+                <h3 className="text-lg font-black italic">Announcements</h3>
+                <span className="text-xs font-bold text-neutral-400 bg-white px-4 py-2 rounded-xl shadow-sm border border-neutral-100">{getTimeLabel(new Date())}</span>
+              </div>
+              <div className="p-4 space-y-2">
+                {announcements.length > 0 ? (
+                  announcements.slice(0, 3).map((item) => (
+                    <div key={item.id} className="group flex items-center justify-between p-5 rounded-[1.5rem] hover:bg-neutral-50 transition-all border border-transparent hover:border-neutral-100">
+                      <div>
+                        <p className="text-md font-bold text-neutral-800 group-hover:text-primary-600 transition-colors">{item.title}</p>
+                        <p className="text-xs text-neutral-400 mt-1 font-medium italic">{formatTime(item.createdAt)}</p>
+                      </div>
+                      <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <FiMoreHorizontal className="w-5 h-5 text-neutral-400" />
+                      </Button>
+                    </div>
+                  ))
+                ) : <EmptyState title="Aucune annonce" />}
+              </div>
+              <div className="p-6 text-center border-t border-neutral-50">
+                <button className="text-sm font-black text-primary-600 hover:underline underline-offset-8 transition-all">See All Announcements</button>
+              </div>
+            </Card>
+          </div>
+
+          {/* Right Column */}
+          <div className="xl:col-span-4 space-y-8">
+            
+            {/* Recently Activity - Premium Dark Card */}
+            <div className="bg-[#161B22] rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-primary-500/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-primary-500/20 transition-all" />
+              <h3 className="text-xl font-black mb-8 relative z-10 italic">Recently Activity</h3>
+              <div className="space-y-2 relative z-10">
+                <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em]">{getTimeLabel(new Date())}</p>
+                <p className="text-lg font-bold leading-tight">You Posted a New Job</p>
+                <p className="text-sm text-neutral-400 font-medium leading-relaxed mb-10">
                   Kindly check the requirements and terms of work and make sure everything is right.
                 </p>
-
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs text-neutral-400">Today you makes 12 Activity</p>
-                  <Button variant="primary" size="sm">
+                <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <p className="text-xs font-bold text-neutral-500">12 Activities today</p>
+                  <Button variant="primary" className="w-full sm:w-auto px-6 py-2 rounded-xl text-xs font-black shadow-lg shadow-primary-900/40">
                     See All Activity
                   </Button>
                 </div>
-              </Card>
-
-              {/* Upcoming Schedule */}
-              <Card padding="lg">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-neutral-900">Upcoming Schedule</h3>
-                  <span className="text-xs text-neutral-500">{getTimeLabel(new Date())}</span>
-                </div>
-
-                {/* Priority Section */}
-                {prioritySchedules.length > 0 && (
-                  <div className="mb-4">
-                    <p className="text-xs font-semibold text-neutral-600 mb-2">Priority</p>
-                    <div className="space-y-2">
-                      {prioritySchedules.slice(0, 3).map((item) => (
-                        <div key={item.id} className="flex items-start justify-between p-2.5 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-neutral-900 mb-0.5 truncate">{item.title || 'Scheduled event'}</p>
-                            <p className="text-xs text-neutral-500">
-                              Today - {formatTime(item.startTime || new Date())}
-                            </p>
-                          </div>
-                          <Button variant="ghost" size="sm" className="p-1 ml-2 flex-shrink-0">
-                            <FiMoreHorizontal className="w-3 h-3 text-neutral-500" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Other Section */}
-                {otherSchedules.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-neutral-600 mb-2">Other</p>
-                    <div className="space-y-2">
-                      {otherSchedules.slice(0, 2).map((item) => (
-                        <div key={item.id} className="flex items-start justify-between p-2.5 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-neutral-900 mb-0.5 truncate">{item.title || 'Scheduled event'}</p>
-                            <p className="text-xs text-neutral-500">
-                              Today - {formatTime(item.startTime || new Date())}
-                            </p>
-                          </div>
-                          <Button variant="ghost" size="sm" className="p-1 ml-2 flex-shrink-0">
-                            <FiMoreHorizontal className="w-3 h-3 text-neutral-500" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {prioritySchedules.length === 0 && otherSchedules.length === 0 && (
-                  <EmptyState
-                    icon={<FiCalendar className="w-8 h-8" />}
-                    title="Aucun événement à venir"
-                  />
-                )}
-
-                <div className="mt-4 text-center border-t border-neutral-200 pt-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-primary-600 hover:text-primary-700"
-                    onClick={() => setIsModalOpen(true)}
-                  >
-                    Create a New Schedule
-                  </Button>
-                </div>
-              </Card>
+              </div>
             </div>
+
+            {/* Schedule */}
+            <Card className="rounded-[3rem] border-neutral-100 p-8 shadow-sm">
+              <div className="flex justify-between items-center mb-10">
+                <h3 className="text-lg font-black italic underline decoration-primary-200 decoration-4 underline-offset-4">Upcoming Schedule</h3>
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">{getTimeLabel(new Date())}</span>
+              </div>
+
+              <div className="space-y-8">
+                {prioritySchedules.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-black text-neutral-300 uppercase tracking-[0.2em] mb-4">Priority</p>
+                    <div className="space-y-3">
+                      {prioritySchedules.map(item => (
+                        <div key={item.id} className="flex gap-4 group cursor-pointer">
+                          <div className="w-1.5 h-12 rounded-full bg-red-400 group-hover:scale-y-110 transition-transform" />
+                          <div className="flex-1 min-w-0 py-1">
+                            <p className="text-sm font-bold text-neutral-800 truncate">{item.title}</p>
+                            <p className="text-xs text-neutral-400 font-medium italic mt-1">{formatTime(item.startTime)}</p>
+                          </div>
+                          <FiMoreHorizontal className="text-neutral-200 group-hover:text-neutral-400" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <p className="text-[10px] font-black text-neutral-300 uppercase tracking-[0.2em] mb-4">Other</p>
+                  <div className="space-y-3">
+                    {otherSchedules.slice(0, 3).map(item => (
+                      <div key={item.id} className="flex gap-4 group cursor-pointer">
+                        <div className="w-1.5 h-12 rounded-full bg-neutral-100 group-hover:bg-primary-200 transition-colors" />
+                        <div className="flex-1 min-w-0 py-1">
+                          <p className="text-sm font-bold text-neutral-700 truncate">{item.title}</p>
+                          <p className="text-xs text-neutral-400 font-medium italic mt-1">{formatTime(item.startTime)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-12">
+                <Button 
+                  variant="ghost" 
+                  className="w-full py-4 border-2 border-dashed border-neutral-100 rounded-2xl text-primary-600 font-black text-xs hover:bg-primary-50 transition-all"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  Create a New Schedule
+                </Button>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
 
-      {/* Modal de création de schedule */}
       <ScheduleFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onScheduleCreated={handleScheduleCreated}
       />
-    </>
+    </div>
   );
 }
