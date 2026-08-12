@@ -7,7 +7,6 @@ import { errorHandler } from './middlewares/error.middleware';
 
 const app: Application = express();
 
-// Security middleware
 app.use(helmet());
 const allowedOrigins = [
   /http:\/\/localhost:\d+/,
@@ -28,32 +27,17 @@ app.use(
 );
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100, 
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: 'Too many requests from this IP, please try again later.',
 });
 
 app.use('/api/', limiter);
 
-// Body
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use('/api', routes);
-
-// TEMPORAIRE — à retirer après le premier seed en production
-app.get('/api/admin/seed', async (req, res) => {
-  if (req.query.key !== process.env.SEED_SECRET) {
-    return res.status(403).json({ success: false, message: 'Forbidden' });
-  }
-  try {
-    const { execSync } = await import('child_process');
-    const output = execSync('npx prisma db seed', { encoding: 'utf-8' });
-    return res.json({ success: true, output });
-  } catch (error: any) {
-    return res.status(500).json({ success: false, error: error.message, output: error.stdout });
-  }
-});
 
 // TEMPORAIRE — à retirer après le premier setup en production
 app.get('/api/admin/seed', async (req, res) => {
@@ -75,7 +59,21 @@ app.get('/api/admin/seed', async (req, res) => {
   }
 });
 
-// 404 handler
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to HR Management System API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      employees: '/api/employees',
+      departments: '/api/departments',
+      dashboard: '/api/dashboard',
+    },
+  });
+});
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -83,7 +81,6 @@ app.use((req, res) => {
   });
 });
 
-// Error handler (must be last)
 app.use(errorHandler);
 
 export default app;
