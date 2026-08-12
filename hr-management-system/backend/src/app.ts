@@ -55,20 +55,28 @@ app.get('/api/admin/seed', async (req, res) => {
   }
 });
 
-// Root route
-app.get('/', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Welcome to HR Management System API',
-    version: '1.0.0',
-    endpoints: {
-      health: '/api/health',
-      auth: '/api/auth',
-      employees: '/api/employees',
-      departments: '/api/departments',
-      dashboard: '/api/dashboard',
-    },
-  });
+// TEMPORAIRE — à retirer après le premier seed en production
+app.get('/api/admin/seed', async (req, res) => {
+  if (req.query.key !== process.env.SEED_SECRET) {
+    return res.status(403).json({ success: false, message: 'Forbidden' });
+  }
+  try {
+    const { execSync } = await import('child_process');
+    const output = execSync('npx prisma db seed', { encoding: 'utf-8', stdio: 'pipe' });
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    const userCount = await prisma.user.count();
+    const users = await prisma.user.findMany({ select: { email: true, role: true } });
+    await prisma.$disconnect();
+    return res.json({ success: true, output, userCount, users });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      stdout: error.stdout?.toString(),
+      stderr: error.stderr?.toString(),
+    });
+  }
 });
 
 // 404 handler
