@@ -39,32 +39,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use('/api', routes);
 
-// TEMPORAIRE — à retirer après le premier seed confirmé en production
-app.get('/api/admin/seed', async (req, res) => {
-  if (req.query.key !== process.env.SEED_SECRET) {
-    return res.status(403).json({ success: false, message: 'Forbidden' });
-  }
-  try {
-    const { execSync } = await import('child_process');
-    // 2>&1 fusionne stderr dans stdout : toute erreur silencieuse de prisma/ts-node devient visible
-    const migrateOutput = execSync('npx prisma migrate deploy 2>&1', { encoding: 'utf-8' });
-    const seedOutput = execSync('npx ts-node prisma/seed.ts 2>&1', { encoding: 'utf-8' });
-
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
-    const userCount = await prisma.user.count();
-    await prisma.$disconnect();
-
-    return res.json({ success: true, migrateOutput, seedOutput, userCount });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-      output: error.stdout?.toString() || error.stderr?.toString(),
-    });
-  }
-});
-
 app.get('/', (req, res) => {
   res.json({
     success: true,
