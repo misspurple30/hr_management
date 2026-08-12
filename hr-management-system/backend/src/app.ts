@@ -47,8 +47,7 @@ app.get('/api/admin/seed', async (req, res) => {
   try {
     const { execSync } = await import('child_process');
     const migrateOutput = execSync('npx prisma migrate deploy', { encoding: 'utf-8', stdio: 'pipe' });
-    const seedOutput = execSync('npx prisma db seed', { encoding: 'utf-8', stdio: 'pipe' });
-    return res.json({ success: true, migrateOutput, seedOutput });
+    const seedOutput = execSync('npx ts-node prisma/seed.ts 2>&1', { encoding: 'utf-8' });    return res.json({ success: true, migrateOutput, seedOutput });
   } catch (error: any) {
     return res.status(500).json({
       success: false,
