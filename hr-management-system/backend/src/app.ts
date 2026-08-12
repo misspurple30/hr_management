@@ -41,6 +41,20 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use('/api', routes);
 
+// TEMPORAIRE — à retirer après le premier seed en production
+app.get('/api/admin/seed', async (req, res) => {
+  if (req.query.key !== process.env.SEED_SECRET) {
+    return res.status(403).json({ success: false, message: 'Forbidden' });
+  }
+  try {
+    const { execSync } = await import('child_process');
+    const output = execSync('npx prisma db seed', { encoding: 'utf-8' });
+    return res.json({ success: true, output });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, error: error.message, output: error.stdout });
+  }
+});
+
 // Root route
 app.get('/', (req, res) => {
   res.json({
