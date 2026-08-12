@@ -55,20 +55,16 @@ app.get('/api/admin/seed', async (req, res) => {
   }
 });
 
-// TEMPORAIRE — à retirer après le premier seed en production
+// TEMPORAIRE — à retirer après le premier setup en production
 app.get('/api/admin/seed', async (req, res) => {
   if (req.query.key !== process.env.SEED_SECRET) {
     return res.status(403).json({ success: false, message: 'Forbidden' });
   }
   try {
     const { execSync } = await import('child_process');
-    const output = execSync('npx prisma db seed', { encoding: 'utf-8', stdio: 'pipe' });
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
-    const userCount = await prisma.user.count();
-    const users = await prisma.user.findMany({ select: { email: true, role: true } });
-    await prisma.$disconnect();
-    return res.json({ success: true, output, userCount, users });
+    const migrateOutput = execSync('npx prisma migrate deploy', { encoding: 'utf-8', stdio: 'pipe' });
+    const seedOutput = execSync('npx prisma db seed', { encoding: 'utf-8', stdio: 'pipe' });
+    return res.json({ success: true, migrateOutput, seedOutput });
   } catch (error: any) {
     return res.status(500).json({
       success: false,
