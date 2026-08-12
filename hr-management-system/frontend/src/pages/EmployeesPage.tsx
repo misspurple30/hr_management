@@ -11,6 +11,7 @@ import Select from '../components/ui/Select';
 import { TableSkeleton } from '../components/ui/Skeleton';
 import ErrorState from '../components/ui/ErrorState';
 import EmptyState from '../components/ui/EmptyState';
+import Avatar from '../components/ui/Avatar';
 
 interface Employee {
   id: string;
@@ -24,6 +25,7 @@ interface Employee {
   department?: {
     id: string;
     name: string;
+    color?: string;
   };
   hireDate: string;
   salary: number;
@@ -191,7 +193,7 @@ export default function EmployeesPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900">Employés</h1>
+              <h1 className="text-3xl font-bold font-display text-neutral-900">Employés</h1>
               <p className="text-sm text-neutral-500 mt-1">{total} employé(s) au total</p>
             </div>
             <Button
@@ -311,11 +313,19 @@ export default function EmployeesPage() {
                       employees.map((employee) => (
                         <tr key={employee.id} className="hover:bg-neutral-50 transition-colors">
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div>
-                              <div className="text-sm font-medium text-neutral-900">
-                                {employee.firstName} {employee.lastName}
+                            <div className="flex items-center gap-3">
+                              <Avatar
+                                firstName={employee.firstName}
+                                lastName={employee.lastName}
+                                color={employee.department?.color}
+                                size="sm"
+                              />
+                              <div>
+                                <div className="text-sm font-semibold font-display text-neutral-900">
+                                  {employee.firstName} {employee.lastName}
+                                </div>
+                                <div className="text-sm text-neutral-500">{employee.email}</div>
                               </div>
-                              <div className="text-sm text-neutral-500">{employee.email}</div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">

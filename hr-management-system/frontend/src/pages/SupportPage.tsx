@@ -46,7 +46,7 @@ export default function SupportPage() {
   return (
     <div className="w-full h-full overflow-y-auto bg-neutral-50 animate-fade-in">
       <div className="max-w-4xl mx-auto p-4 lg:p-8">
-        <h1 className="text-3xl font-bold text-neutral-900 mb-2">Support</h1>
+        <h1 className="text-3xl font-bold font-display text-neutral-900 mb-2">Support</h1>
         <p className="text-sm text-neutral-500 mb-8">Besoin d'aide ? Trouvez des réponses ou contactez-nous</p>
 
         {/* Quick Links */}

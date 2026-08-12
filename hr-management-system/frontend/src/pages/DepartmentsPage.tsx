@@ -8,6 +8,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { PageSkeleton } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
+import ErrorState from '../components/ui/ErrorState';
 
 interface Department {
   id: string;
@@ -88,6 +89,14 @@ export default function DepartmentsPage() {
     return <PageSkeleton />;
   }
 
+  if (error && departments.length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-neutral-50 p-4 lg:p-8">
+        <ErrorState message={error} onRetry={fetchDepartments} />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="w-full h-full overflow-y-auto bg-neutral-50 animate-fade-in">
@@ -96,7 +105,7 @@ export default function DepartmentsPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900">Départements</h1>
+              <h1 className="text-3xl font-bold font-display text-neutral-900">Départements</h1>
               <p className="text-sm text-neutral-500 mt-1">{departments.length} département(s) au total</p>
             </div>
             {canManage && (
@@ -157,7 +166,7 @@ export default function DepartmentsPage() {
                             {dept.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <h3 className="text-base font-semibold text-neutral-900">{dept.name}</h3>
+                            <h3 className="text-base font-semibold font-display text-neutral-900">{dept.name}</h3>
                             <p className="text-xs text-neutral-500 flex items-center gap-1 mt-0.5">
                               <FiUsers className="w-3 h-3" />
                               {employeeCount} employé{employeeCount !== 1 ? 's' : ''}

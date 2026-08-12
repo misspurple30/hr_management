@@ -5,6 +5,7 @@ import api from '../api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import Avatar from '../components/ui/Avatar';
 
 type Tab = 'profile' | 'password' | 'notifications';
 
@@ -117,7 +118,7 @@ export default function SettingsPage() {
   return (
     <div className="w-full h-full overflow-y-auto bg-neutral-50 animate-fade-in">
       <div className="max-w-4xl mx-auto p-4 lg:p-8">
-        <h1 className="text-3xl font-bold text-neutral-900 mb-2">Paramètres</h1>
+        <h1 className="text-3xl font-bold font-display text-neutral-900 mb-2">Paramètres</h1>
         <p className="text-sm text-neutral-500 mb-8">Gérez votre compte et vos préférences</p>
 
         {/* Tabs */}
@@ -155,13 +156,9 @@ export default function SettingsPage() {
         {activeTab === 'profile' && (
           <Card padding="lg">
             <div className="flex items-center gap-4 mb-6 pb-6 border-b border-neutral-200">
-              <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center">
-                <span className="text-primary-600 font-bold text-xl">
-                  {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-                </span>
-              </div>
+              <Avatar firstName={user?.firstName || ''} lastName={user?.lastName || ''} size="lg" />
               <div>
-                <h2 className="text-lg font-semibold text-neutral-900">{user?.firstName} {user?.lastName}</h2>
+                <h2 className="text-lg font-semibold font-display text-neutral-900">{user?.firstName} {user?.lastName}</h2>
                 <div className="flex items-center gap-2 mt-1">
                   <FiShield className="w-3.5 h-3.5 text-neutral-400" />
                   <span className="text-sm text-neutral-500">{getRoleDisplay(user?.role || '')}</span>

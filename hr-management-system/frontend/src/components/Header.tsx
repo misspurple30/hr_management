@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FiSearch, FiBell, FiChevronDown, FiMenu, FiLogOut, FiUser } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
+import Avatar from './ui/Avatar';
 
 interface User {
   id: string;
@@ -53,9 +54,6 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
     return roles[role] || role;
   };
 
-  const getInitials = (firstName: string, lastName: string) =>
-    `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-
   return (
     <header className="bg-white border-b border-neutral-200 px-4 sm:px-6 h-16 flex items-center sticky top-0 z-10">
       <div className="flex items-center justify-between w-full">
@@ -102,11 +100,12 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className="flex items-center gap-2.5 cursor-pointer group p-1.5 rounded-lg hover:bg-neutral-50 transition-colors"
               >
-                <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center ring-2 ring-neutral-100 group-hover:ring-primary-200 transition-all">
-                  <span className="text-primary-700 font-semibold text-xs">
-                    {getInitials(user.firstName, user.lastName)}
-                  </span>
-                </div>
+                <Avatar
+                  firstName={user.firstName}
+                  lastName={user.lastName}
+                  size="sm"
+                  className="ring-2 ring-neutral-100 group-hover:ring-primary-200 transition-all"
+                />
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-medium text-neutral-800 leading-tight">
                     {user.firstName} {user.lastName}

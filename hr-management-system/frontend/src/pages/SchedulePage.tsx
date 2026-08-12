@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
-import { FiPlus, FiTrash2, FiClock, FiUser, FiCalendar, FiFilter } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiUser, FiCalendar, FiFilter } from 'react-icons/fi';
 import ScheduleFormModal from '../components/ScheduleFormModal';
 import { useAuth } from '../context/AuthContext';
 import Card from '../components/ui/Card';
@@ -159,7 +159,7 @@ export default function SchedulePage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900">Schedule</h1>
+              <h1 className="text-3xl font-bold font-display text-neutral-900">Schedule</h1>
               <p className="text-sm text-neutral-500 mt-1">{schedules.length} événement(s)</p>
             </div>
             {canManage && (

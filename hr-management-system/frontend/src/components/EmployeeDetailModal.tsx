@@ -2,6 +2,7 @@ import { FiMail, FiPhone, FiCalendar, FiDollarSign, FiBriefcase, FiUser } from '
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
+import Avatar from './ui/Avatar';
 
 interface EmployeeDetailsModalProps {
   isOpen: boolean;
@@ -69,11 +70,14 @@ export default function EmployeeDetailsModal({ isOpen, onClose, employee }: Empl
     >
       {/* Profile Header */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
-          <FiUser className="w-8 h-8 text-primary-600" />
-        </div>
+        <Avatar
+          firstName={employee.firstName}
+          lastName={employee.lastName}
+          color={employee.department?.color}
+          size="lg"
+        />
         <div>
-          <h3 className="text-xl font-semibold text-neutral-900">
+          <h3 className="text-xl font-semibold font-display text-neutral-900">
             {employee.firstName} {employee.lastName}
           </h3>
           <p className="text-sm text-neutral-500">{employee.position}</p>

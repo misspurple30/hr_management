@@ -2,7 +2,6 @@ import { NavLink } from 'react-router-dom';
 import type { ElementType } from 'react';
 import {
   IoGrid,
-  IoPersonAddOutline,
   IoCalendarOutline,
   IoPeopleOutline,
   IoBusinessOutline,
@@ -77,7 +76,6 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
             </p>
             <div className="space-y-0.5">
               <NavItem to="/" icon={IoGrid} label="Dashboard" end={true} />
-              <NavItem to="/recruitment" icon={IoPersonAddOutline} label="Recruitment" />
               <NavItem to="/schedule" icon={IoCalendarOutline} label="Schedule" />
               <NavItem to="/employees" icon={IoPeopleOutline} label="Employee" />
               <NavItem to="/departments" icon={IoBusinessOutline} label="Department" />
