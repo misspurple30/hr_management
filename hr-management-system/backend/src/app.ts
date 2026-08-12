@@ -9,9 +9,20 @@ const app: Application = express();
 
 // Security middleware
 app.use(helmet());
+const allowedOrigins = [
+  /http:\/\/localhost:\d+/,
+  process.env.FRONTEND_URL,
+].filter(Boolean) as (string | RegExp)[];
+
 app.use(
   cors({
-    origin: /http:\/\/localhost:\d+/, 
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const isAllowed = allowedOrigins.some((allowed) =>
+        allowed instanceof RegExp ? allowed.test(origin) : allowed === origin
+      );
+      callback(isAllowed ? null : new Error('Not allowed by CORS'), isAllowed);
+    },
     credentials: true,
   })
 );
